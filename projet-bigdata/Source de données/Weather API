@@ -1,0 +1,32 @@
+!pip install geopy
+import requests
+from geopy.geocoders import Nominatim
+api_key = "8e1ed7d169b915599a1f09c23298b2f2"
+# Obtenir les coordonnées géographiques de chaque pays européen à partir de GeoPy
+geolocator = Nominatim(user_agent="my-custom-user-agent")
+countries = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia",
+             "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
+             "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Malta",
+             "Moldova", "Monaco", "Montenegro", "Netherlands", "North Macedonia", "Norway", "Poland", "Portugal",
+             "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
+             "Ukraine", "United Kingdom", "Vatican City"]
+import pandas as pd
+weather_data = []
+for country in countries:
+    location = geolocator.geocode(country)
+    lat, lon = location.latitude, location.longitude
+    url = f"http://api.openweathermap.org/data/2.5/weather?lat=%7Blat%7D&lon=%7Blon%7D&appid=%7Bapi_key%7D"
+    response = requests.get(url)
+    data = response.json()
+    weather = {
+        'Country': country,
+        'Description': data['weather'][0]['description'],
+        'Temperature (K)': data['main']['temp'],
+        'Pressure (hPa)': data['main']['pressure'],
+        'Humidity (%)': data['main']['humidity'],
+        'Wind Speed (m/s)': data['wind']['speed']
+    }
+    weather_data.append(weather)
+
+df = pd.DataFrame(weather_data)
+df
